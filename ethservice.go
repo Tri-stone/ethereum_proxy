@@ -317,7 +317,7 @@ func (s *ethService) BlockNumber(r *http.Request, _ *interface{}, reply *string)
 	if err != nil {
 		return fmt.Errorf("failed to get latest block number: %s", err)
 	}
-	*reply = "0x" + strconv.FormatUint(uint64(blockNumber), 16)
+	*reply = "0x" + strconv.FormatUint(blockNumber, 16)
 
 	return nil
 }
@@ -530,26 +530,25 @@ func (s *ethService) BlockNumber(r *http.Request, _ *interface{}, reply *string)
 
 // https://github.com/ethereum/wiki/wiki/JSON-RPC#the-default-block-parameter
 func (s *ethService) parseBlockNum(input string) (uint64, error) {
-	blockHeightPB := &pb.BlockHeight{
+	bcStatusPB := &pb.BCStatus{
 		Header: &pb.Header{
 			Logid: global.Glogid(),
 		},
 		Bcname: "xuper",
-		Height: 100,
 	}
 
 	// check if it's one of the named-blocks
 	switch input {
 	case "latest":
 		// latest
-		blockchainInfo, err := s.xchainClient.GetBlockByHeight(context.TODO(), blockHeightPB)
+		bcStatus, err := s.xchainClient.GetBlockChainStatus(context.TODO(), bcStatusPB)
 		if err != nil {
 			s.logger.Debug(err)
 			return 0, fmt.Errorf("failed to query the ledger: %v", err)
 		}
 		// height is the block being worked on now, we want the previous block
-		s.logger.Info(blockchainInfo.Blockid)
-		topBlockNumber := uint64(10000)
+		s.logger.Info(bcStatus.GetBlock().GetHeight())
+		topBlockNumber := uint64(bcStatus.GetBlock().GetHeight())
 		return topBlockNumber, nil
 	case "earliest":
 		return 0, nil
