@@ -8,6 +8,7 @@ package ethereum_proxy
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -42,7 +43,8 @@ type EthService interface {
 	//Accounts(r *http.Request, arg *string, reply *[]string) error
 	EstimateGas(r *http.Request, args *types.EthArgs, reply *string) error
 	//GetBalance(r *http.Request, p *[]string, reply *string) error
-	//GetBlockByNumber(r *http.Request, p *[]interface{}, reply *types.Block) error
+	GetBlockByNumber(r *http.Request, p *[]interface{}, reply *types.Block) error
+	//GetBlockByHash(r *http.Request, p *[]interface{}, reply *types.Block) error
 	BlockNumber(r *http.Request, _ *interface{}, reply *string) error
 	//GetTransactionByHash(r *http.Request, txID *string, reply *types.Transaction) error
 	//GetTransactionCount(r *http.Request, _ *interface{}, reply *string) error
@@ -214,100 +216,101 @@ func (s *ethService) EstimateGas(r *http.Request, _ *types.EthArgs, reply *strin
 //	return nil
 //}
 
-//// https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getblockbynumber
-//func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *types.Block) error {
-//	s.logger.Debug("Received a request for GetBlockByNumber")
-//	params := *p
-//	s.logger.Debug("Params are : ", params)
-//
-//	// handle params
-//	// must have two params
-//	numParams := len(params)
-//	if numParams != 2 {
-//		return fmt.Errorf("need 2 params, got %q", numParams)
-//	}
-//	// first arg is string of block to get
-//	number, ok := params[0].(string)
-//	if !ok {
-//		s.logger.Debugf("Incorrect argument received: %#v", params[0])
-//		return fmt.Errorf("Incorrect first parameter sent, must be string")
-//	}
-//
-//	// second arg is bool for full txn or hash txn
-//	fullTransactions, ok := params[1].(bool)
-//	if !ok {
-//		return fmt.Errorf("Incorrect second parameter sent, must be boolean")
-//	}
-//
-//	parsedNumber, err := s.parseBlockNum(strip0x(number))
-//	if err != nil {
-//		return err
-//	}
-//
-//	block, err := s.ledgerClient.QueryBlock(parsedNumber)
-//	if err != nil {
-//		return fmt.Errorf("Failed to query the ledger: %v", err)
-//	}
-//
-//	blkHeader := block.GetHeader()
-//
-//	blockHash := "0x" + hex.EncodeToString(blockHash(blkHeader))
-//	blockNumber := "0x" + strconv.FormatUint(parsedNumber, 16)
-//
-//	// each data is a txn
-//	data := block.GetData().GetData()
-//	transactionsFilter := util.TxValidationFlags(block.GetMetadata().GetMetadata()[common.BlockMetadataIndex_TRANSACTIONS_FILTER])
-//	txns := make([]interface{}, 0, len(data))
-//
-//	// drill into the block to find the transaction ids it contains
-//	for index, transactionData := range data {
-//		if transactionData == nil {
-//			continue
-//		}
-//
-//		if !transactionsFilter.IsValid(index) {
-//			continue
-//		}
-//
-//		payload, chdr, err := getChannelHeaderandPayloadFromTransactionData(transactionData)
-//		if err != nil {
-//			return err
-//		}
-//
-//		if fullTransactions {
-//			txn := types.Transaction{
-//				BlockHash:        blockHash,
-//				BlockNumber:      blockNumber,
-//				TransactionIndex: "0x" + strconv.FormatUint(uint64(index), 16),
-//				Hash:             "0x" + chdr.TxId,
-//			}
-//			to, input, from, _, err := getTransactionInformation(payload)
-//			if err != nil {
-//				return err
-//			}
-//
-//			txn.To = "0x" + to
-//			txn.Input = "0x" + input
-//			txn.From = from
-//			txns = append(txns, txn)
-//		} else {
-//			txns = append(txns, "0x"+chdr.TxId)
-//		}
-//	}
-//
-//	blk := types.Block{
-//		BlockData: types.BlockData{
-//			Number:     blockNumber,
-//			Hash:       blockHash,
-//			ParentHash: "0x" + hex.EncodeToString(blkHeader.GetPreviousHash()),
-//		},
-//		Transactions: txns,
-//	}
-//	s.logger.Debug("asked for block", number, "found block", blk)
-//
-//	*reply = blk
-//	return nil
-//}
+// https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getblockbynumber
+func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *types.Block) error {
+	s.logger.Debug("Received a request for GetBlockByNumber")
+	params := *p
+	s.logger.Debug("Params are : ", params)
+
+	// handle params
+	// must have two params
+	numParams := len(params)
+	if numParams != 2 {
+		return fmt.Errorf("need 2 params, got %q", numParams)
+	}
+	// first arg is string of block to get
+	number, ok := params[0].(string)
+	if !ok {
+		s.logger.Debugf("Incorrect argument received: %#v", params[0])
+		return fmt.Errorf("Incorrect first parameter sent, must be string")
+	}
+
+	// second arg is bool for full txn or hash txn
+	fullTransactions, ok := params[1].(bool)
+	if !ok {
+		return fmt.Errorf("Incorrect second parameter sent, must be boolean")
+	}
+
+	blockHeight, err := strconv.ParseInt(number, 10, 64)
+	if err != nil {
+		return fmt.Errorf("Incorrect first parameter sent, invalid block height")
+	}
+
+	blockHeightPB := &pb.BlockHeight{
+		Header: &pb.Header{
+			Logid: global.Glogid(),
+		},
+		Bcname: "xuper",
+		Height: blockHeight,
+	}
+
+	block, err := s.xchainClient.GetBlockByHeight(context.TODO(), blockHeightPB)
+	if err != nil {
+		s.logger.Debug(err)
+		return fmt.Errorf("failed to query the ledger: %v", err)
+	}
+	// height is the block being worked on now, we want the previous block
+	s.logger.Info(block.Blockid)
+
+	//blkHeader := block.GetHeader()
+
+	blockHash := "0x" + hex.EncodeToString(block.Blockid)
+	blockNumber := "0x" + strconv.FormatUint(uint64(blockHeight), 16)
+
+	// each data is a txn
+	data := block.GetBlock().GetTransactions()
+	txns := make([]interface{}, 0, len(data))
+
+	// drill into the block to find the transaction ids it contains
+	for index, transactionData := range data {
+		if transactionData == nil {
+			continue
+		}
+
+		if fullTransactions {
+			txn := types.Transaction{
+				BlockHash:        blockHash,
+				BlockNumber:      blockNumber,
+				TransactionIndex: "0x" + strconv.FormatUint(uint64(index), 16),
+				Hash:             "0x" + hex.EncodeToString(transactionData.GetTxid()),
+			}
+			to, input, from, err := getTransactionInformation(transactionData)
+			if err != nil {
+				return err
+			}
+
+			txn.To = "0x" + to
+			txn.Input = "0x" + input
+			txn.From = from
+			txns = append(txns, txn)
+		} else {
+			txns = append(txns, "0x"+hex.EncodeToString(transactionData.GetTxid()))
+		}
+	}
+
+	blk := types.Block{
+		BlockData: types.BlockData{
+			Number:     blockNumber,
+			Hash:       blockHash,
+			ParentHash: "0x" + hex.EncodeToString(block.Block.PreHash),
+		},
+		Transactions: txns,
+	}
+	s.logger.Debug("asked for block", number, "found block", blk)
+
+	*reply = blk
+	return nil
+}
 
 func (s *ethService) BlockNumber(r *http.Request, _ *interface{}, reply *string) error {
 	blockNumber, err := s.parseBlockNum("latest")
@@ -598,51 +601,14 @@ func (s *ethService) parseBlockNum(input string) (uint64, error) {
 //	return ccProposalPayload, respPayload, nil
 //}
 //
-//// getTransactionInformation takes a payload
-//// It returns if available the To, Input, From, the Response Payload of the transaction in the payload, otherwise it returns an error
-//func getTransactionInformation(payload *common.Payload) (string, string, string, *peer.ChaincodeAction, error) {
-//	txActions := &peer.Transaction{}
-//	err := proto.Unmarshal(payload.GetData(), txActions)
-//	if err != nil {
-//		return "", "", "", nil, err
-//	}
-//
-//	ccPropPayload, respPayload, err := getPayloads(txActions.GetActions()[0])
-//	if err != nil {
-//		return "", "", "", nil, fmt.Errorf("Failed to unmarshal transaction: %s", err)
-//	}
-//
-//	invokeSpec := &peer.ChaincodeInvocationSpec{}
-//	err = proto.Unmarshal(ccPropPayload.GetInput(), invokeSpec)
-//	if err != nil {
-//		return "", "", "", nil, fmt.Errorf("Failed to unmarshal transaction: %s", err)
-//	}
-//
-//	// callee, input data is standard case, also handle getcode & account cases
-//	args := invokeSpec.GetChaincodeSpec().GetInput().Args
-//
-//	if len(args) != 2 || string(args[0]) == "getCode" {
-//		// no more data available to fill the transaction
-//		return "", "", "", respPayload, nil
-//	}
-//
-//	sigHdr := &common.SignatureHeader{}
-//	if err := proto.Unmarshal(payload.GetHeader().GetSignatureHeader(), sigHdr); err != nil {
-//		return "", "", "", nil, fmt.Errorf("Failed unmarshaling signature header: %s", err)
-//	}
-//
-//	from, err := address.IdentityToAddr(sigHdr.GetCreator())
-//	if err != nil {
-//		return "", "", "", nil, fmt.Errorf("Failed generating from address: %s", err)
-//	}
-//
-//	// At this point, this is either an EVM Contract Deploy,
-//	// or an EVM Contract Invoke. We don't care about the
-//	// specific case, fill in the fields directly.
-//
-//	// First arg is to and second arg is the input data
-//	return string(args[0]), string(args[1]), "0x" + hex.EncodeToString(from), respPayload, nil
-//}
+// getTransactionInformation takes a payload
+// It returns if available the To, Input, From, the Response Payload of the transaction in the payload, otherwise it returns an error
+func getTransactionInformation(tx *pb.Transaction) (string, string, string, error) {
+
+	//return string(args[0]), string(args[1]), "0x" + hex.EncodeToString(from), nil
+	return "", "", "", nil
+}
+
 //
 //// findTransaction takes in the txId and  block data from block.GetData().GetData() where block is of type *common.Block
 //// It returns the index of the transaction, transaction payload, otherwise it returns an error
