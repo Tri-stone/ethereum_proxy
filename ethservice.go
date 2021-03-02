@@ -43,7 +43,7 @@ type EthService interface {
 	EstimateGas(r *http.Request, args *types.EthArgs, reply *string) error
 	//GetBalance(r *http.Request, p *[]string, reply *string) error
 	//GetBlockByNumber(r *http.Request, p *[]interface{}, reply *types.Block) error
-	//BlockNumber(r *http.Request, _ *interface{}, reply *string) error
+	BlockNumber(r *http.Request, _ *interface{}, reply *string) error
 	//GetTransactionByHash(r *http.Request, txID *string, reply *types.Transaction) error
 	//GetTransactionCount(r *http.Request, _ *interface{}, reply *string) error
 	//GetLogs(*http.Request, *types.GetLogsArgs, *[]types.Log) error

@@ -15,8 +15,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 
 	"github.com/Tri-stone/xuperchain/ethereum_proxy"
 	"github.com/xuperchain/xuperchain/core/pb"
@@ -40,17 +40,18 @@ var proxyCmd = &cobra.Command{
 	},
 }
 
-var cfg string
+var host string
 var port int
 
 // InitFlags sets up the flags and environment variables for Proxy
 func initFlags() {
-	viper.BindEnv("config")
+	viper.SetEnvPrefix("PROXY")
+	viper.BindEnv("host")
 	viper.BindEnv("port")
 
-	proxyCmd.PersistentFlags().StringVarP(&cfg, "config", "c", "",
-		"Path to a compatible Fabric SDK Go config file. This flag is required if PROXY_CONFIG is not set.")
-	viper.BindPFlag("config", proxyCmd.PersistentFlags().Lookup("config"))
+	proxyCmd.PersistentFlags().StringVarP(&host, "host", "t", "127.0.0.1:37101",
+		"Path to a compatible Fabric SDK Go config file. This flag is required if PROXY_HOST is not set.")
+	viper.BindPFlag("config", proxyCmd.PersistentFlags().Lookup("host"))
 
 
 	//Port defaults to 5000 if PORT is not set or `-p,-port` is not provided
@@ -63,9 +64,9 @@ func initFlags() {
 // Flag values are taken over environment variables
 // Both CCID and Port have defaults so do not need to be provided.
 func checkFlags() error {
-	cfg = viper.GetString("config")
-	if cfg == "" {
-		return fmt.Errorf("Missing config. Please use flag --config or set PROXY_CONFIG")
+	host = viper.GetString("host")
+	if host == "" {
+		return fmt.Errorf("Missing host. Please use flag --host or set PROXY_HOST")
 	}
 
 	port = viper.GetInt("port")
@@ -76,7 +77,7 @@ func checkFlags() error {
 // Will exit gracefully for errors and signal interrupts
 func runProxy(cmd *cobra.Command, args []string) error {
 
-	xchainClient, eventClient, err := initXchainClient(cfg)
+	xchainClient, eventClient, err := initXchainClient(host)
 	if err != nil {
 		return fmt.Errorf("Failed to create xchainClient: %s\n", err)
 	}
