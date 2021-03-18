@@ -236,7 +236,7 @@ func (tx *Transaction) MarshalJSON() ([]byte, error) {
 	type Alias Transaction
 	temp := (Alias)(*tx)
 	temp.GasPrice = "0x0"
-	temp.Value = "0x0"
+	//temp.Value = "0x0"
 
 	return json.Marshal(temp)
 }
