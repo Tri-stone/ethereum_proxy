@@ -16,12 +16,19 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/Tri-stone/xuperchain/ethereum_proxy/types"
+	"github.com/Tri-stone/ethereum_proxy/types"
 	"github.com/xuperchain/xuperchain/core/global"
 	"github.com/xuperchain/xuperchain/core/pb"
 )
 
 var ZeroAddress = make([]byte, 20)
+
+const (
+	bcName = "xuper"
+	txHadhLength = 66
+	blockHashLength = 66
+	coinBaseFrom = "0x000000000000000000000000000000000"
+)
 
 // EthService is the rpc server implementation. Each function is an
 // implementation of one ethereum json-rpc
@@ -70,6 +77,10 @@ func NewEthService(xchainClient pb.XchainClient, eventClient pb.EventServiceClie
 		filterMap:    make(map[uint64]interface{}),
 	}
 }
+
+
+
+
 
 //func (s *ethService) GetCode(r *http.Request, arg *string, reply *string) error {
 //	strippedAddr := strip0x(*arg)
@@ -261,10 +272,9 @@ func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *
 	}
 	// height is the block being worked on now, we want the previous block
 	s.logger.Info(block.Blockid)
-
 	//blkHeader := block.GetHeader()
-
-	blockHash := "0x" + hex.EncodeToString(block.Blockid)
+	//fmt.Printf("1 Tom blockId:%s \n",string(block.Block.Blockid))
+	blockHash := "0x" + hex.EncodeToString(block.Block.Blockid)
 	blockNumber := "0x" + strconv.FormatUint(uint64(blockHeight), 16)
 
 	// each data is a txn
@@ -284,14 +294,21 @@ func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *
 				TransactionIndex: "0x" + strconv.FormatUint(uint64(index), 16),
 				Hash:             "0x" + hex.EncodeToString(transactionData.GetTxid()),
 			}
-			to, input, from, err := getTransactionInformation(transactionData)
+			//from,to,input, err := getTransactionInformation(transactionData)
+			//if err != nil {
+			//	return err
+			//}
+
+			tx,err := parseTransaction(transactionData)
 			if err != nil {
-				return err
+				s.logger.Debug(err)
+				return fmt.Errorf("parse Transaction error")
 			}
 
-			txn.To = "0x" + to
-			txn.Input = "0x" + input
-			txn.From = from
+
+			txn.To = "0x" + tx.To
+			txn.Input = "0x" + tx.Input
+			txn.From = tx.From
 			txns = append(txns, txn)
 		} else {
 			txns = append(txns, "0x"+hex.EncodeToString(transactionData.GetTxid()))
@@ -311,6 +328,7 @@ func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *
 	*reply = blk
 	return nil
 }
+
 
 func (s *ethService) BlockNumber(r *http.Request, _ *interface{}, reply *string) error {
 	blockNumber, err := s.parseBlockNum("latest")
@@ -602,11 +620,20 @@ func (s *ethService) parseBlockNum(input string) (uint64, error) {
 //
 // getTransactionInformation takes a payload
 // It returns if available the To, Input, From, the Response Payload of the transaction in the payload, otherwise it returns an error
-func getTransactionInformation(tx *pb.Transaction) (string, string, string, error) {
-
-	//return string(args[0]), string(args[1]), "0x" + hex.EncodeToString(from), nil
-	return "", "", "", nil
-}
+//func getTransactionInformation(tx *pb.Transaction) (string, string, string, error) {
+//	input := fmt.Sprintf("%s",tx.TxInputs)
+//	from := tx.Initiator
+//	if tx.Coinbase{
+//		from = coinBaseFrom
+//	}
+//	to := tx.Initiator
+//	for _,output := range tx.TxOutputs{
+//		if string(output.ToAddr) != from{
+//			to = string(output.ToAddr)
+//		}
+//	}
+//	return from,to,input, nil
+//}
 
 //
 //// findTransaction takes in the txId and  block data from block.GetData().GetData() where block is of type *common.Block

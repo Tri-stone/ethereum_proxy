@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	"github.com/Tri-stone/xuperchain/ethereum_proxy"
+	"github.com/Tri-stone/ethereum_proxy"
 	"github.com/xuperchain/xuperchain/core/pb"
 )
 
