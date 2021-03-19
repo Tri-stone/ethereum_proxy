@@ -16,7 +16,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/Tri-stone/ethereum_proxy/types"
+	"github.com/Tri-stone/xuperchain/ethereum_proxy/types"
 	"github.com/xuperchain/xuperchain/core/global"
 	"github.com/xuperchain/xuperchain/core/pb"
 )
@@ -24,10 +24,10 @@ import (
 var ZeroAddress = make([]byte, 20)
 
 const (
-	bcName = "xuper"
-	txHadhLength = 66
+	bcName          = "xuper"
+	txHadhLength    = 66
 	blockHashLength = 66
-	coinBaseFrom = "0x000000000000000000000000000000000"
+	coinBaseFrom    = "0x000000000000000000000000000000000"
 )
 
 // EthService is the rpc server implementation. Each function is an
@@ -49,11 +49,11 @@ type EthService interface {
 	//GetTransactionReceipt(r *http.Request, arg *string, reply *types.TxReceipt) error
 	//Accounts(r *http.Request, arg *string, reply *[]string) error
 	EstimateGas(r *http.Request, args *types.EthArgs, reply *string) error
-	//GetBalance(r *http.Request, p *[]string, reply *string) error
+	GetBalance(r *http.Request, p *[]string, reply *string) error
 	GetBlockByNumber(r *http.Request, p *[]interface{}, reply *types.Block) error
-	//GetBlockByHash(r *http.Request, p *[]interface{}, reply *types.Block) error
+	GetBlockByHash(r *http.Request, p *[]interface{}, reply *types.Block) error
 	BlockNumber(r *http.Request, _ *interface{}, reply *string) error
-	//GetTransactionByHash(r *http.Request, txID *string, reply *types.Transaction) error
+	GetTransactionByHash(r *http.Request, txID *string, reply *types.Transaction) error
 	//GetTransactionCount(r *http.Request, _ *interface{}, reply *string) error
 	//GetLogs(*http.Request, *types.GetLogsArgs, *[]types.Log) error
 	//NewFilter(*http.Request, *types.GetLogsArgs, *string) error
@@ -77,10 +77,6 @@ func NewEthService(xchainClient pb.XchainClient, eventClient pb.EventServiceClie
 		filterMap:    make(map[uint64]interface{}),
 	}
 }
-
-
-
-
 
 //func (s *ethService) GetCode(r *http.Request, arg *string, reply *string) error {
 //	strippedAddr := strip0x(*arg)
@@ -217,16 +213,6 @@ func (s *ethService) EstimateGas(r *http.Request, _ *types.EthArgs, reply *strin
 	return nil
 }
 
-// GetBalance takes an address and a block, but this implementation
-// does not check or use either parameter.
-//
-// Always returns zero.
-//func (s *ethService) GetBalance(r *http.Request, p *[]string, reply *string) error {
-//	s.logger.Debug("GetBalance called")
-//	*reply = "0x0"
-//	return nil
-//}
-
 // https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getblockbynumber
 func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *types.Block) error {
 	s.logger.Debug("Received a request for GetBlockByNumber")
@@ -299,12 +285,11 @@ func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *
 			//	return err
 			//}
 
-			tx,err := parseTransaction(transactionData)
+			tx, err := parseTransaction(transactionData)
 			if err != nil {
 				s.logger.Debug(err)
 				return fmt.Errorf("parse Transaction error")
 			}
-
 
 			txn.To = "0x" + tx.To
 			txn.Input = "0x" + tx.Input
@@ -329,7 +314,6 @@ func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *
 	return nil
 }
 
-
 func (s *ethService) BlockNumber(r *http.Request, _ *interface{}, reply *string) error {
 	blockNumber, err := s.parseBlockNum("latest")
 	if err != nil {
@@ -339,61 +323,6 @@ func (s *ethService) BlockNumber(r *http.Request, _ *interface{}, reply *string)
 
 	return nil
 }
-
-// GetTransactionByHash takes a TransactionID as a string and returns the
-// details of the transaction.
-//
-// The implementation of this function follows the EVM ChainCode implementation
-// of Invoke.
-//
-// Since this takes only one string, we can have gorilla verify that it has
-// received only a single string, and skip our own verification.
-//
-// https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gettransactionbyhash
-//func (s *ethService) GetTransactionByHash(r *http.Request, txID *string, reply *types.Transaction) error {
-//	strippedTxId := strip0x(*txID)
-//
-//	if strippedTxId == "" {
-//		return fmt.Errorf("txID was empty")
-//	}
-//	s.logger.Debug("GetTransactionByHash", strippedTxId) // logging input to function
-//
-//	txn := types.Transaction{
-//		Hash: "0x" + strippedTxId,
-//	}
-//
-//	block, err := s.ledgerClient.QueryBlockByTxID(fab.TransactionID(strippedTxId))
-//	if err != nil {
-//		return fmt.Errorf("Failed to query the ledger: %s", err)
-//	}
-//	blkHeader := block.GetHeader()
-//	txn.BlockHash = "0x" + hex.EncodeToString(blockHash(blkHeader))
-//	txn.BlockNumber = "0x" + strconv.FormatUint(blkHeader.GetNumber(), 16)
-//
-//	index, txPayload, err := findTransaction(strippedTxId, block.GetData().GetData())
-//	if err != nil {
-//		return fmt.Errorf("Failed to parse through transactions in the block: %s", err)
-//	}
-//
-//	txn.TransactionIndex = index
-//
-//	to, input, from, _, err := getTransactionInformation(txPayload)
-//	if err != nil {
-//		return err
-//	}
-//
-//	if to != "" {
-//		txn.To = "0x" + to
-//	}
-//
-//	if input != "" {
-//		txn.Input = "0x" + input
-//	}
-//	txn.From = from
-//
-//	*reply = txn
-//	return nil
-//}
 
 //// GetTransactionCount will always return 0 regardless of the provided parameters.
 ////

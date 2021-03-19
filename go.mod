@@ -1,4 +1,4 @@
-module github.com/Tri-stone/ethereum_proxy
+module github.com/Tri-stone/xuperchain/ethereum_proxy
 
 go 1.13
 

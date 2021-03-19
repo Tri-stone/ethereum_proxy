@@ -18,5 +18,14 @@ curl -H "Content-Type:application/json" -d '{"jsonrpc":"2.0","method":"eth_estim
 curl -H "Content-Type:application/json" -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' 127.0.0.1:5000
 
 curl -H "Content-Type:application/json" -d '{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["10000", true],"id":1}' 127.0.0.1:5000
+
+// dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN => 0x93F86A462A3174C7AD1281BCF400A9F18D244E06
+curl -H "Content-Type:application/json" -d '{"jsonrpc":"2.0","method":"eth_getBalance","params":["0x93F86A462A3174C7AD1281BCF400A9F18D244E06", "latest"],"id":1}' 127.0.0.1:5000
+
+curl -H "Content-Type:application/json" -d '{"jsonrpc":"2.0","method":"eth_getTransactionByHash","params":["0x27f55958c8c1656699563b2f7bf3e3ad4e4476f5526d41065a9efa6e50b082b5"],"id":1}' 127.0.0.1:5000
+
+// If true it returns the full transaction objects, if false only the hashes of the transactions.
+curl -H "Content-Type:application/json" -d '{"jsonrpc":"2.0","method":"eth_getBlockByHash","params":["0x494181a8688c1550e8deea48e1eca750790169cf1b654089f88b126e4624c33e",
+   false],"id":1}' 127.0.0.1:5000
 ```
 
