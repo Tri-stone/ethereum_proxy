@@ -6,7 +6,6 @@ SPDX-License-Identifier: Apache-2.0
 
 package main
 
-
 import (
 	"fmt"
 	"os"
@@ -52,7 +51,6 @@ func initFlags() {
 	proxyCmd.PersistentFlags().StringVarP(&host, "host", "t", "127.0.0.1:37101",
 		"Path to a compatible Fabric SDK Go config file. This flag is required if PROXY_HOST is not set.")
 	viper.BindPFlag("config", proxyCmd.PersistentFlags().Lookup("host"))
-
 
 	//Port defaults to 5000 if PORT is not set or `-p,-port` is not provided
 	proxyCmd.PersistentFlags().IntVarP(&port, "port", "p", 5000,

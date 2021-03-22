@@ -24,10 +24,11 @@ import (
 var ZeroAddress = make([]byte, 20)
 
 const (
-	bcName = "xuper"
-	txHadhLength = 66
+	bcName          = "xuper"
+	txHadhLength    = 66
 	blockHashLength = 66
-	coinBaseFrom = "0x000000000000000000000000000000000"
+	AddressLength   = 42
+	coinBaseFrom    = "0x000000000000000000000000000000000"
 )
 
 // EthService is the rpc server implementation. Each function is an
@@ -77,10 +78,6 @@ func NewEthService(xchainClient pb.XchainClient, eventClient pb.EventServiceClie
 		filterMap:    make(map[uint64]interface{}),
 	}
 }
-
-
-
-
 
 //func (s *ethService) GetCode(r *http.Request, arg *string, reply *string) error {
 //	strippedAddr := strip0x(*arg)
@@ -202,21 +199,6 @@ func NewEthService(xchainClient pb.XchainClient, eventClient pb.EventServiceClie
 //	return nil
 //}
 
-// EstimateGas accepts the same arguments as Call but all arguments are
-// optional.  This implementation ignores all arguments and returns a zero
-// estimate.
-//
-// The intention is to estimate how much gas is necessary to allow a transaction
-// to complete.
-//
-// EVM-chaincode does not require gas to run transactions. The chaincode will
-// give enough gas per transaction.
-func (s *ethService) EstimateGas(r *http.Request, _ *types.EthArgs, reply *string) error {
-	s.logger.Debug("EstimateGas called")
-	*reply = "0x0"
-	return nil
-}
-
 // GetBalance takes an address and a block, but this implementation
 // does not check or use either parameter.
 //
@@ -299,12 +281,11 @@ func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *
 			//	return err
 			//}
 
-			tx,err := parseTransaction(transactionData)
+			tx, err := parseTransaction(transactionData)
 			if err != nil {
 				s.logger.Debug(err)
 				return fmt.Errorf("parse Transaction error")
 			}
-
 
 			txn.To = "0x" + tx.To
 			txn.Input = "0x" + tx.Input
@@ -328,7 +309,6 @@ func (s *ethService) GetBlockByNumber(r *http.Request, p *[]interface{}, reply *
 	*reply = blk
 	return nil
 }
-
 
 func (s *ethService) BlockNumber(r *http.Request, _ *interface{}, reply *string) error {
 	blockNumber, err := s.parseBlockNum("latest")

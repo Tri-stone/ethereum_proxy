@@ -6,12 +6,29 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Tri-stone/ethereum_proxy/types"
+	"github.com/hyperledger/burrow/crypto"
+	"github.com/xuperchain/xuperchain/core/contract/evm"
 	"github.com/xuperchain/xuperchain/core/global"
 	"github.com/xuperchain/xuperchain/core/pb"
 	"math/big"
 	"net/http"
 	"strconv"
 )
+
+// EstimateGas accepts the same arguments as Call but all arguments are
+// optional.  This implementation ignores all arguments and returns a zero
+// estimate.
+//
+// The intention is to estimate how much gas is necessary to allow a transaction
+// to complete.
+//
+// EVM-chaincode does not require gas to run transactions. The chaincode will
+// give enough gas per transaction.
+func (s *ethService) EstimateGas(r *http.Request, _ *types.EthArgs, reply *string) error {
+	s.logger.Debug("EstimateGas called")
+	*reply = "0x0"
+	return nil
+}
 
 //func (s *ethService) GetTransactionReceipt(r *http.Request, arg *string, reply *types.TxReceipt) error{    //todo
 //	if len(*arg) != txLength {
@@ -55,10 +72,10 @@ func (s *ethService) GetTransactionByHash(r *http.Request, txID *string, reply *
 		return fmt.Errorf("can not parse the transaction")
 	}
 
-	block,err := s.getBlockByHash(tx.BlockHash,false)
+	block, err := s.getBlockByHash(tx.BlockHash, false)
 	if err != nil {
 		s.logger.Error(err)
-		return fmt.Errorf("get Block number error:%s\n",err.Error())
+		return fmt.Errorf("get Block number error:%s\n", err.Error())
 	}
 	tx.BlockNumber = block.Number
 	*reply = *tx
@@ -108,13 +125,13 @@ func parseTransaction(tx *pb.Transaction) (*types.Transaction, error) {
 	}
 
 	transaction := &types.Transaction{
-		BlockHash:        blockHash,
-		Hash:             txHash,
-		From:             from,
-		To:               to,
-		Input:            string(bz),
-		GasPrice:         "",
-		Value:            valueTotal.String(),
+		BlockHash: blockHash,
+		Hash:      txHash,
+		From:      from,
+		To:        to,
+		Input:     string(bz),
+		GasPrice:  "",
+		Value:     valueTotal.String(),
 	}
 	return transaction, nil
 }
@@ -124,6 +141,7 @@ func (s *ethService) GetBalance(r *http.Request, p *[]string, reply *string) err
 	if len(params) != 2 {
 		return fmt.Errorf("need 2 params, got %q", len(params))
 	}
+	// dpzuVdosQrF2kmzumhVeFQZa1aYcdgFpN
 
 	switch params[1] {
 	case "latest":
@@ -134,9 +152,20 @@ func (s *ethService) GetBalance(r *http.Request, p *[]string, reply *string) err
 	default:
 		return fmt.Errorf("only the latest is supported now")
 	}
-	account := params[0]
+	//account := params[0]
+	evmAddr, err := crypto.AddressFromHexString(params[0][2:])
+	if err != nil {
+		return fmt.Errorf("can not transfer the address:%s to xuperChain account", params[0])
+	}
+
+	addr, _, err := evm.DetermineEVMAddress(evmAddr)
+	if err != nil {
+		fmt.Printf("DetermineXchainAddress err:%s\n", err.Error())
+		return fmt.Errorf("can not transfer the address:%s to xuperChain account", params[0])
+	}
+
 	pbAddrStatus := &pb.AddressStatus{
-		Address: account,
+		Address: addr,
 		Bcs: []*pb.TokenDetail{
 			{Bcname: bcName},
 		},
@@ -146,8 +175,12 @@ func (s *ethService) GetBalance(r *http.Request, p *[]string, reply *string) err
 		s.logger.Error(err)
 		return fmt.Errorf("can not get Balance from ledger\n")
 	}
-	balance := addrStatus.Bcs[0].Balance	// todo 如果有多个币种？
-	*reply = balance
+	balance, ok := big.NewInt(0).SetString(addrStatus.Bcs[0].Balance, 10) // todo 如果有多个币种？
+	if !ok {
+		s.logger.Errorf("parse balance to Ox error\n")
+		return fmt.Errorf("Server Internal error\n")
+	}
+	*reply = fmt.Sprintf("0x%x", balance)
 	return nil
 }
 
@@ -169,7 +202,7 @@ func (s *ethService) GetBlockByHash(r *http.Request, p *[]interface{}, reply *ty
 	if !ok {
 		return fmt.Errorf("Incorrect second parameter sent, must be boolean")
 	}
-	block,err := s.getBlockByHash(blockHash,fullTransactions)
+	block, err := s.getBlockByHash(blockHash, fullTransactions)
 	if err != nil {
 		s.logger.Errorf("getBlockHash error: %#v", err.Error())
 		return fmt.Errorf("getBlockHash error")
@@ -178,11 +211,10 @@ func (s *ethService) GetBlockByHash(r *http.Request, p *[]interface{}, reply *ty
 	return nil
 }
 
-
-func (s *ethService)getBlockByHash(blockHash string,fullTransactions bool) (*types.Block,error) {
-	rawBlockid, err := hex.DecodeString(blockHash[2:])		// 去掉0x
+func (s *ethService) getBlockByHash(blockHash string, fullTransactions bool) (*types.Block, error) {
+	rawBlockid, err := hex.DecodeString(blockHash[2:]) // 去掉0x
 	if err != nil {
-		return nil,fmt.Errorf("invalid blockHash")
+		return nil, fmt.Errorf("invalid blockHash")
 	}
 
 	blockId := &pb.BlockID{
@@ -196,15 +228,15 @@ func (s *ethService)getBlockByHash(blockHash string,fullTransactions bool) (*typ
 
 	b, err := s.xchainClient.GetBlock(context.TODO(), blockId)
 	if err != nil {
-		return nil,fmt.Errorf("failed to query the ledger: %v", err)
+		return nil, fmt.Errorf("failed to query the ledger: %v", err)
 	}
 
 	block, err := parseBlock(b, fullTransactions)
 	if err != nil {
 		s.logger.Debug(err)
-		return nil,fmt.Errorf("failed to query the ledger: %v", err)
+		return nil, fmt.Errorf("failed to query the ledger: %v", err)
 	}
-	return block,nil
+	return block, nil
 }
 
 func parseBlock(block *pb.Block, fullTransactions bool) (*types.Block, error) {
@@ -225,17 +257,10 @@ func parseBlock(block *pb.Block, fullTransactions bool) (*types.Block, error) {
 				TransactionIndex: "0x" + strconv.FormatUint(uint64(index), 16),
 				Hash:             "0x" + hex.EncodeToString(transactionData.GetTxid()),
 			}
-			//from, to, input, err := getTransactionInformation(transactionData)
-			//if err != nil {
-			//	return nil, err
-			//}
-
-
-			tx,err := parseTransaction(transactionData)
+			tx, err := parseTransaction(transactionData)
 			if err != nil {
-				return nil,fmt.Errorf("parse Transaction error")
+				return nil, fmt.Errorf("parse Transaction error")
 			}
-
 
 			txn.To = "0x" + tx.To
 			txn.Input = "0x" + tx.Input
