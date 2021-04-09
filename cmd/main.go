@@ -6,7 +6,6 @@ SPDX-License-Identifier: Apache-2.0
 
 package main
 
-
 import (
 	"fmt"
 	"os"
@@ -18,7 +17,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	"github.com/Tri-stone/xuperchain/ethereum_proxy"
+	"github.com/Tri-stone/ethereum_proxy"
 	"github.com/xuperchain/xuperchain/core/pb"
 )
 
@@ -53,7 +52,6 @@ func initFlags() {
 		"Path to a compatible Fabric SDK Go config file. This flag is required if PROXY_HOST is not set.")
 	viper.BindPFlag("config", proxyCmd.PersistentFlags().Lookup("host"))
 
-
 	//Port defaults to 5000 if PORT is not set or `-p,-port` is not provided
 	proxyCmd.PersistentFlags().IntVarP(&port, "port", "p", 5000,
 		"Port that Proxy will be running on. The listening port can also be set by the PROXY_PORT environment variable.")
@@ -77,7 +75,7 @@ func checkFlags() error {
 // Will exit gracefully for errors and signal interrupts
 func runProxy(cmd *cobra.Command, args []string) error {
 
-	xchainClient, eventClient, err := initXchainClient(host)
+	xchainClient, eventClient,filterClient, err := initXchainClient(host)
 	if err != nil {
 		return fmt.Errorf("Failed to create xchainClient: %s\n", err)
 	}
@@ -88,7 +86,7 @@ func runProxy(cmd *cobra.Command, args []string) error {
 	}
 	logger := rawLogger.Named("proxy").Sugar()
 
-	ethService := ethereum_proxy.NewEthService(xchainClient, eventClient, logger)
+	ethService := ethereum_proxy.NewEthService(xchainClient, eventClient, filterClient,logger)
 
 	proxy := ethereum_proxy.NewEthereumProxy(ethService, port)
 
@@ -123,10 +121,12 @@ func main() {
 	}
 }
 
-func initXchainClient(host string) (pb.XchainClient, pb.EventServiceClient, error) {
+
+func initXchainClient(host string) (pb.XchainClient, pb.EventServiceClient,pb.EvmFilterClient, error) {
 	conn, err := grpc.Dial(host, grpc.WithInsecure(), grpc.WithMaxMsgSize(64<<20-1))
 	if err != nil {
-		return nil, nil, err
+		return nil,nil, nil,err
 	}
-	return pb.NewXchainClient(conn), pb.NewEventServiceClient(conn), nil
+
+	return pb.NewXchainClient(conn), pb.NewEventServiceClient(conn),pb.NewEvmFilterClient(conn),nil
 }
