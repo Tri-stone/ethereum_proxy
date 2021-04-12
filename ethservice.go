@@ -11,20 +11,20 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/burrow/crypto"
-	"github.com/xuperchain/xuperchain/core/contract/evm"
-	"github.com/xuperchain/xuperchain/core/global"
 	"io"
 	"math/big"
 	"net/http"
 	"strconv"
 	"sync"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/burrow/crypto"
+	"github.com/xuperchain/xuperchain/core/contract/evm"
+	"github.com/xuperchain/xuperchain/core/global"
+	"github.com/xuperchain/xuperchain/core/pb"
 	"go.uber.org/zap"
 
 	"github.com/Tri-stone/ethereum_proxy/types"
-	"github.com/xuperchain/xuperchain/core/pb"
 )
 
 var ZeroAddress = make([]byte, 20)
@@ -80,11 +80,11 @@ type ethService struct {
 	filterSeq     uint64
 }
 
-func NewEthService(xchainClient pb.XchainClient, eventClient pb.EventServiceClient, logger *zap.SugaredLogger) EthService {
+func NewEthService(xchainClient pb.XchainClient, eventClient pb.EventServiceClient, filterClient pb.EvmFilterClient, logger *zap.SugaredLogger) EthService {
 	return &ethService{
 		xchainClient: xchainClient,
 		eventClient:  eventClient,
-		filterClient: tomFilterClient,
+		filterClient: filterClient,
 		logger:       logger.Named("ethservice"),
 		filterMap:    make(map[uint64]interface{}),
 	}
