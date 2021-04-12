@@ -1,8 +1,6 @@
 /*
-Copyright IBM Corp. All Rights Reserved.
-
-SPDX-License-Identifier: Apache-2.0
-*/
+ * Copyright (c) 2021. Baidu Inc. All Rights Reserved.
+ */
 
 package ethereum_proxy
 

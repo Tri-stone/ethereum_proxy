@@ -1,8 +1,6 @@
 /*
-Copyright IBM Corp. All Rights Reserved.
-
-SPDX-License-Identifier: Apache-2.0
-*/
+ * Copyright (c) 2021. Baidu Inc. All Rights Reserved.
+ */
 
 package ethereum_proxy
 
@@ -24,7 +22,7 @@ import (
 	"github.com/xuperchain/xuperchain/core/pb"
 	"go.uber.org/zap"
 
-	"github.com/Tri-stone/ethereum_proxy/types"
+	"github.com/Tri-stone/xuperchain/ethereum_proxy/types"
 )
 
 var ZeroAddress = make([]byte, 20)

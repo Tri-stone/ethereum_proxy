@@ -1,14 +1,13 @@
 /*
-Copyright IBM Corp. All Rights Reserved.
-
-SPDX-License-Identifier: Apache-2.0
-*/
+ * Copyright (c) 2021. Baidu Inc. All Rights Reserved.
+ */
 
 package main
 
 import (
 	"fmt"
 	"os"
+
 	"os/signal"
 	"syscall"
 
@@ -75,7 +74,7 @@ func checkFlags() error {
 // Will exit gracefully for errors and signal interrupts
 func runProxy(cmd *cobra.Command, args []string) error {
 
-	xchainClient, eventClient,filterClient, err := initXchainClient(host)
+	xchainClient, eventClient, filterClient, err := initXchainClient(host)
 	if err != nil {
 		return fmt.Errorf("Failed to create xchainClient: %s\n", err)
 	}
@@ -86,7 +85,7 @@ func runProxy(cmd *cobra.Command, args []string) error {
 	}
 	logger := rawLogger.Named("proxy").Sugar()
 
-	ethService := ethereum_proxy.NewEthService(xchainClient, eventClient, filterClient,logger)
+	ethService := ethereum_proxy.NewEthService(xchainClient, eventClient, filterClient, logger)
 
 	proxy := ethereum_proxy.NewEthereumProxy(ethService, port)
 
@@ -121,12 +120,11 @@ func main() {
 	}
 }
 
-
-func initXchainClient(host string) (pb.XchainClient, pb.EventServiceClient,pb.EvmFilterClient, error) {
+func initXchainClient(host string) (pb.XchainClient, pb.EventServiceClient, pb.EvmFilterClient, error) {
 	conn, err := grpc.Dial(host, grpc.WithInsecure(), grpc.WithMaxMsgSize(64<<20-1))
 	if err != nil {
-		return nil,nil, nil,err
+		return nil, nil, nil, err
 	}
 
-	return pb.NewXchainClient(conn), pb.NewEventServiceClient(conn),pb.NewEvmFilterClient(conn),nil
+	return pb.NewXchainClient(conn), pb.NewEventServiceClient(conn), pb.NewEvmFilterClient(conn), nil
 }
