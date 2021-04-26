@@ -49,10 +49,10 @@ const (
 // see godoc for RegisterService(receiver interface{}, name string) error
 //
 type EthService interface {
-	GetCode(r *http.Request, arg *string, reply *string) error
+	//GetCode(r *http.Request, arg *string, reply *string) error
 	//Call(r *http.Request, args *types.EthArgs, reply *string) error
 	//SendTransaction(r *http.Request, args *types.EthArgs, reply *string) error
-	GetTransactionReceipt(r *http.Request, arg *string, reply *types.TxReceipt) error
+	//GetTransactionReceipt(r *http.Request, arg *string, reply *types.TxReceipt) error
 	//Accounts(r *http.Request, arg *string, reply *[]string) error
 	EstimateGas(r *http.Request, args *types.EthArgs, reply *string) error
 	GetBalance(r *http.Request, p *[]string, reply *string) error
@@ -62,54 +62,55 @@ type EthService interface {
 	GetTransactionByHash(r *http.Request, txID *string, reply *types.Transaction) error
 	//GetTransactionCount(r *http.Request, _ *interface{}, reply *string) error
 	GetLogs(*http.Request, *types.GetLogsArgs, *[]types.Log) error
-	NewFilter(*http.Request, *types.GetLogsArgs, *string) error
-	GetFilterLogs(*http.Request, *string, *[]types.Log) error
-	UninstallFilter(*http.Request, *string, *bool) error
-	GetFilter(*http.Request, *string, *[]types.Log) error
+	//NewFilter(*http.Request, *types.GetLogsArgs, *string) error
+	//GetFilterLogs(*http.Request, *string, *[]types.Log) error
+	//UninstallFilter(*http.Request, *string, *bool) error
+	//GetFilter(*http.Request, *string, *[]types.Log) error
 }
 
 type ethService struct {
-	xchainClient  pb.XchainClient
-	eventClient   pb.EventServiceClient
-	filterClient  pb.EvmFilterClient
+	xchainClient pb.XchainClient
+	eventClient  pb.EventServiceClient
+	//filterClient  pb.EvmFilterClient
 	logger        *zap.SugaredLogger
 	filterMapLock sync.Mutex
 	filterMap     map[uint64]interface{}
 	filterSeq     uint64
 }
 
-func NewEthService(xchainClient pb.XchainClient, eventClient pb.EventServiceClient, filterClient pb.EvmFilterClient, logger *zap.SugaredLogger) EthService {
+//func NewEthService(xchainClient pb.XchainClient, eventClient pb.EventServiceClient, filterClient pb.EvmFilterClient, logger *zap.SugaredLogger) EthService {
+func NewEthService(xchainClient pb.XchainClient, eventClient pb.EventServiceClient, logger *zap.SugaredLogger) EthService {
 	return &ethService{
 		xchainClient: xchainClient,
 		eventClient:  eventClient,
-		filterClient: filterClient,
-		logger:       logger.Named("ethservice"),
-		filterMap:    make(map[uint64]interface{}),
+		//filterClient: filterClient,
+		logger:    logger.Named("ethservice"),
+		filterMap: make(map[uint64]interface{}),
 	}
 }
 
-func (s *ethService) GetCode(r *http.Request, arg *string, reply *string) error {
-	if len(*arg) != contracrLength {
-		return fmt.Errorf("Invalid Transaction Hash,Expect Length:%d, But Got:%d\n", contracrLength, len(*arg))
-	}
-	evmAddrStr := *arg
-	name, err := evm2xuper(evmAddrStr)
-	if err != nil {
-		return err
-	}
-	pbContract := &pb.ContractCode{
-		Bcname: bcName,
-		Name:   name,
-	}
-	contractCode, err := s.xchainClient.GetCode(context.TODO(), pbContract)
-	if err != nil {
-		s.logger.Error(err)
-		return fmt.Errorf("Can Not Get the Code\n")
-	}
-	code := fmt.Sprintf("%x", contractCode.Code)
-	*reply = code
-	return nil
-}
+//func (s *ethService) GetCode(r *http.Request, arg *string, reply *string) error {
+//	if len(*arg) != contracrLength {
+//		return fmt.Errorf("Invalid Transaction Hash,Expect Length:%d, But Got:%d\n", contracrLength, len(*arg))
+//	}
+//	evmAddrStr := *arg
+//	name, err := evm2xuper(evmAddrStr)
+//	if err != nil {
+//		return err
+//	}
+//	pbContract := &pb.ContractCode{
+//		Bcname: bcName,
+//		Name:   name,
+//	}
+//	contractCode, err := s.xchainClient.GetCode(context.TODO(), pbContract)
+//	if err != nil {
+//		s.logger.Error(err)
+//		return fmt.Errorf("Can Not Get the Code\n")
+//	}
+//	code := fmt.Sprintf("%x", contractCode.Code)
+//	*reply = code
+//	return nil
+//}
 
 //func (s *ethService) Call(r *http.Request, args *types.EthArgs, reply *string) error {
 //	response, err := s.query(s.ccid, strip0x(args.To), [][]byte{[]byte(strip0x(args.Data))})
@@ -142,46 +143,46 @@ func (s *ethService) GetCode(r *http.Request, arg *string, reply *string) error 
 //	return nil
 //}
 
-func (s *ethService) GetTransactionReceipt(r *http.Request, arg *string, reply *types.TxReceipt) error { //todo
-	txHash := *arg
-	if len(txHash) != txHashLength {
-		return fmt.Errorf("invalid transaction hash,expect length:%d, but got:%d", txHashLength, len(txHash))
-	}
-	rawTxId, err := hex.DecodeString(txHash[2:])
-	if err != nil {
-		s.logger.Error(err)
-		return fmt.Errorf("invalid transcation hash")
-	}
-	pbTxStatus := &pb.TxStatus{
-		Header: &pb.Header{
-			Logid: global.Glogid(),
-		},
-		Bcname: bcName,
-		Txid:   rawTxId,
-	}
-	receipt, err := s.xchainClient.GetTransactionReceipt(context.TODO(), pbTxStatus)
-	if err != nil {
-		s.logger.Error(err)
-		return fmt.Errorf("get transactionReceipt error")
-	}
-	if receipt.TxStatus.Status == pb.TransactionStatus_NOEXIST {
-		return fmt.Errorf("Transaction Not Exit\n")
-	}
-	if receipt.TxStatus.Status != pb.TransactionStatus_CONFIRM {
-		return fmt.Errorf("Get TransactionReceipt Err\n")
-	}
-	result := &types.TxReceipt{}
-	result.TransactionHash = fmt.Sprintf("%x", receipt.TxStatus.Txid)
-	result.BlockHash = fmt.Sprintf("%x", receipt.TxStatus.Tx.Blockid)
-	result.BlockNumber = fmt.Sprintf("%d", receipt.BlockNumber)
-	//reply.ContractAddress
-	logs := parseEvmLog2TyepLogs(receipt.Log)
-	result.Logs = logs
-	result.From = receipt.TxStatus.Tx.Initiator
-	//reply.To
-	*reply = *result
-	return nil
-}
+//func (s *ethService) GetTransactionReceipt(r *http.Request, arg *string, reply *types.TxReceipt) error { //todo
+//	txHash := *arg
+//	if len(txHash) != txHashLength {
+//		return fmt.Errorf("invalid transaction hash,expect length:%d, but got:%d", txHashLength, len(txHash))
+//	}
+//	rawTxId, err := hex.DecodeString(txHash[2:])
+//	if err != nil {
+//		s.logger.Error(err)
+//		return fmt.Errorf("invalid transcation hash")
+//	}
+//	pbTxStatus := &pb.TxStatus{
+//		Header: &pb.Header{
+//			Logid: global.Glogid(),
+//		},
+//		Bcname: bcName,
+//		Txid:   rawTxId,
+//	}
+//	receipt, err := s.xchainClient.GetTransactionReceipt(context.TODO(), pbTxStatus)
+//	if err != nil {
+//		s.logger.Error(err)
+//		return fmt.Errorf("get transactionReceipt error")
+//	}
+//	if receipt.TxStatus.Status == pb.TransactionStatus_NOEXIST {
+//		return fmt.Errorf("Transaction Not Exit\n")
+//	}
+//	if receipt.TxStatus.Status != pb.TransactionStatus_CONFIRM {
+//		return fmt.Errorf("Get TransactionReceipt Err\n")
+//	}
+//	result := &types.TxReceipt{}
+//	result.TransactionHash = fmt.Sprintf("%x", receipt.TxStatus.Txid)
+//	result.BlockHash = fmt.Sprintf("%x", receipt.TxStatus.Tx.Blockid)
+//	result.BlockNumber = fmt.Sprintf("%d", receipt.BlockNumber)
+//	//reply.ContractAddress
+//	logs := parseEvmLog2TyepLogs(receipt.Log)
+//	result.Logs = logs
+//	result.From = receipt.TxStatus.Tx.Initiator
+//	//reply.To
+//	*reply = *result
+//	return nil
+//}
 
 func (s *ethService) EstimateGas(r *http.Request, _ *types.EthArgs, reply *string) error {
 	s.logger.Debug("EstimateGas called")
@@ -455,127 +456,127 @@ func (s *ethService) GetLogs(r *http.Request, args *types.GetLogsArgs, logs *[]t
 	return nil
 }
 
-func (s *ethService) NewFilter(r *http.Request, args *types.GetLogsArgs, result *string) error {
-	if args == nil {
-		return fmt.Errorf("Filter can not be nil\n")
-	}
+//func (s *ethService) NewFilter(r *http.Request, args *types.GetLogsArgs, result *string) error {
+//	if args == nil {
+//		return fmt.Errorf("Filter can not be nil\n")
+//	}
+//
+//	in := &pb.EvmFilterBody{}
+//	if args.FromBlock != "" {
+//		in.Start = args.FromBlock
+//	}
+//	if args.ToBlock != "" {
+//		in.End = args.ToBlock
+//	}
+//	//if logArgs.BlockHash != ""{				// blockHash 暂不支持。在eth中，也只是一个 Future features
+//	//	in.
+//	//}
+//
+//	if len(args.Address) > 0 {
+//		name, err := evm2xuper(args.Address[0]) // 暂不支持多地址查询
+//		if err != nil {
+//			return err
+//		}
+//		in.Contract = name
+//	}
+//	//args.topics 		topic 暂不支持
+//	resp, err := s.filterClient.NewFilter(context.TODO(), in)
+//	if err != nil {
+//		fmt.Printf("NewTomFilter err:%s\n", err.Error())
+//		return err
+//	} else {
+//		fmt.Printf("resp:%+v\n", resp)
+//	}
+//	*result = resp.FilterID
+//	return nil
+//}
 
-	in := &pb.EvmFilterBody{}
-	if args.FromBlock != "" {
-		in.Start = args.FromBlock
-	}
-	if args.ToBlock != "" {
-		in.End = args.ToBlock
-	}
-	//if logArgs.BlockHash != ""{				// blockHash 暂不支持。在eth中，也只是一个 Future features
-	//	in.
-	//}
+//func (s *ethService) GetFilter(r *http.Request, id *string, logs *[]types.Log) error {
+//	filterID := *id
+//	in := &pb.EvmFilterBody{
+//		FilterID: filterID,
+//	}
+//	body, err := s.filterClient.GetFilter(context.TODO(), in)
+//	if err != nil {
+//		fmt.Printf("getFilter err:%s\n", err.Error())
+//		return nil
+//	}
+//	fmt.Println(body.String())
+//	return nil
+//}
 
-	if len(args.Address) > 0 {
-		name, err := evm2xuper(args.Address[0]) // 暂不支持多地址查询
-		if err != nil {
-			return err
-		}
-		in.Contract = name
-	}
-	//args.topics 		topic 暂不支持
-	resp, err := s.filterClient.NewFilter(context.TODO(), in)
-	if err != nil {
-		fmt.Printf("NewTomFilter err:%s\n", err.Error())
-		return err
-	} else {
-		fmt.Printf("resp:%+v\n", resp)
-	}
-	*result = resp.FilterID
-	return nil
-}
+//func (s *ethService) UninstallFilter(r *http.Request, id *string, ok *bool) error {
+//	if id == nil {
+//		return fmt.Errorf("FilterID can not be nil")
+//	}
+//	filterID := *id
+//	in := &pb.EvmFilterBody{
+//		FilterID: filterID,
+//	}
+//	resp, err := s.filterClient.UninstallFilter(context.TODO(), in)
+//	if err != nil {
+//		return err
+//	}
+//	if resp.Status == "delete SUCCESS" {
+//		*ok = true
+//	}
+//	return nil
+//}
 
-func (s *ethService) GetFilter(r *http.Request, id *string, logs *[]types.Log) error {
-	filterID := *id
-	in := &pb.EvmFilterBody{
-		FilterID: filterID,
-	}
-	body, err := s.filterClient.GetFilter(context.TODO(), in)
-	if err != nil {
-		fmt.Printf("getFilter err:%s\n", err.Error())
-		return nil
-	}
-	fmt.Println(body.String())
-	return nil
-}
-
-func (s *ethService) UninstallFilter(r *http.Request, id *string, ok *bool) error {
-	if id == nil {
-		return fmt.Errorf("FilterID can not be nil")
-	}
-	filterID := *id
-	in := &pb.EvmFilterBody{
-		FilterID: filterID,
-	}
-	resp, err := s.filterClient.UninstallFilter(context.TODO(), in)
-	if err != nil {
-		return err
-	}
-	if resp.Status == "delete SUCCESS" {
-		*ok = true
-	}
-	return nil
-}
-
-func (s *ethService) GetFilterLogs(r *http.Request, id *string, logs *[]types.Log) error {
-	filterID := *id
-	in := &pb.EvmFilterBody{
-		FilterID: filterID,
-	}
-	filter, err := s.filterClient.GetFilter(context.TODO(), in)
-	if err != nil {
-		return err
-	}
-
-	blockFilter := &pb.BlockFilter{
-		Range: &pb.BlockRange{},
-	}
-	if filter.Bcname != "" {
-		blockFilter.Bcname = filter.Bcname
-	} else {
-		blockFilter.Bcname = bcName
-	}
-	if filter.Start != "" {
-		blockFilter.Range.Start = filter.Start
-	}
-	if filter.End != "" {
-		blockFilter.Range.End = filter.End
-	}
-	if filter.Contract != "" {
-		blockFilter.Contract = filter.Contract
-	}
-	if filter.EventName != "" {
-		blockFilter.Contract = filter.EventName
-	}
-	if filter.Initiator != "" {
-		blockFilter.Initiator = filter.Initiator
-	}
-	if filter.AuthRequire != "" {
-		blockFilter.AuthRequire = filter.AuthRequire
-	}
-	if filter.FromAddr != "" {
-		blockFilter.FromAddr = filter.FromAddr
-	}
-	if filter.ToAddr != "" {
-		blockFilter.ToAddr = filter.ToAddr
-	}
-	buf, _ := proto.Marshal(blockFilter)
-	request := &pb.SubscribeRequest{
-		Type:   pb.SubscribeType_BLOCK,
-		Filter: buf,
-	}
-
-	err = s.getLogs(request, logs)
-	if err != nil {
-		return nil
-	}
-	return nil
-}
+//func (s *ethService) GetFilterLogs(r *http.Request, id *string, logs *[]types.Log) error {
+//	filterID := *id
+//	in := &pb.EvmFilterBody{
+//		FilterID: filterID,
+//	}
+//	filter, err := s.filterClient.GetFilter(context.TODO(), in)
+//	if err != nil {
+//		return err
+//	}
+//
+//	blockFilter := &pb.BlockFilter{
+//		Range: &pb.BlockRange{},
+//	}
+//	if filter.Bcname != "" {
+//		blockFilter.Bcname = filter.Bcname
+//	} else {
+//		blockFilter.Bcname = bcName
+//	}
+//	if filter.Start != "" {
+//		blockFilter.Range.Start = filter.Start
+//	}
+//	if filter.End != "" {
+//		blockFilter.Range.End = filter.End
+//	}
+//	if filter.Contract != "" {
+//		blockFilter.Contract = filter.Contract
+//	}
+//	if filter.EventName != "" {
+//		blockFilter.Contract = filter.EventName
+//	}
+//	if filter.Initiator != "" {
+//		blockFilter.Initiator = filter.Initiator
+//	}
+//	if filter.AuthRequire != "" {
+//		blockFilter.AuthRequire = filter.AuthRequire
+//	}
+//	if filter.FromAddr != "" {
+//		blockFilter.FromAddr = filter.FromAddr
+//	}
+//	if filter.ToAddr != "" {
+//		blockFilter.ToAddr = filter.ToAddr
+//	}
+//	buf, _ := proto.Marshal(blockFilter)
+//	request := &pb.SubscribeRequest{
+//		Type:   pb.SubscribeType_BLOCK,
+//		Filter: buf,
+//	}
+//
+//	err = s.getLogs(request, logs)
+//	if err != nil {
+//		return nil
+//	}
+//	return nil
+//}
 
 func (s *ethService) getLogs(req *pb.SubscribeRequest, logs *[]types.Log) error {
 	stream, err := s.eventClient.Subscribe(context.TODO(), req)
@@ -785,26 +786,26 @@ func parseTransaction(tx *pb.Transaction) (*types.Transaction, error) {
 	return transaction, nil
 }
 
-func parseEvmLog2TyepLogs(logs []*pb.Log) []types.Log {
-	typeLogs := []types.Log{}
-	if len(logs) == 0 {
-		return typeLogs
-	}
-	for _, log := range logs {
-		typeLog := types.Log{}
-		typeLog.Address = log.Address
-		typeLog.Topics = log.Topics
-		typeLog.Data = string(log.Data)
-
-		typeLog.BlockNumber = fmt.Sprintf("0x%x", log.BlockNumber)
-		typeLog.BlockHash = fmt.Sprintf("0x%x", log.GetBlockId())
-		typeLog.TxHash = fmt.Sprintf("0x%x", log.TxId)
-		//typeLog.TxIndex =
-		//typeLog.Index =
-		typeLogs = append(typeLogs, typeLog)
-	}
-	return typeLogs
-}
+//func parseEvmLog2TyepLogs(logs []*pb.Log) []types.Log {
+//	typeLogs := []types.Log{}
+//	if len(logs) == 0 {
+//		return typeLogs
+//	}
+//	for _, log := range logs {
+//		typeLog := types.Log{}
+//		typeLog.Address = log.Address
+//		typeLog.Topics = log.Topics
+//		typeLog.Data = string(log.Data)
+//
+//		typeLog.BlockNumber = fmt.Sprintf("0x%x", log.BlockNumber)
+//		typeLog.BlockHash = fmt.Sprintf("0x%x", log.GetBlockId())
+//		typeLog.TxHash = fmt.Sprintf("0x%x", log.TxId)
+//		//typeLog.TxIndex =
+//		//typeLog.Index =
+//		typeLogs = append(typeLogs, typeLog)
+//	}
+//	return typeLogs
+//}
 
 func evm2xuper(evmAddrStr string) (string, error) {
 	evmAddr, err := crypto.AddressFromHexString(evmAddrStr[2:])

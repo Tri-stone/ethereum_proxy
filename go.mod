@@ -1,4 +1,4 @@
-module github.com/Tri-stone/ethereum_proxy
+module github.com/Tri-stone/xuperchain/ethereum_proxy
 
 go 1.13
 
@@ -17,7 +17,7 @@ require (
 	google.golang.org/grpc v1.36.0
 )
 
-replace github.com/hyperledger/burrow => github.com/xuperchain/burrow v0.30.6-0.20210304060557-02933899eeb0
+replace github.com/hyperledger/burrow => github.com/xuperchain/burrow v0.30.6-0.20210317023017-369050d94f4a
 
 //todo 此处需要修改
-replace github.com/xuperchain/xuperchain => /Users/shikenian/go/src/github.com/xuperchain/xuperchain
+replace github.com/xuperchain/xuperchain => /Users/zhanglei85/go/src/github.com/xuperchain/xuperchain
