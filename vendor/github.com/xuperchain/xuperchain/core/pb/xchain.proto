@@ -110,6 +110,8 @@ service Xchain {
     };
   }
 
+  rpc GetContractParams(ContractParams) returns (ContractParams);
+
   rpc GetAccountContracts(GetAccountContractsRequest)
       returns (GetAccountContractsResponse) {
     option (google.api.http) = {
@@ -1072,4 +1074,12 @@ message ContractEvent {
     string contract = 1;
     string name = 2;
     bytes body = 3;
+}
+
+message ContractParams{
+    Header header = 1;
+    string bcname = 2;
+    string name = 3;
+    bytes  code = 4;
+    string abi  = 5;
 }
