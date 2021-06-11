@@ -1,0 +1,379 @@
+# github.com/ChainSafe/go-schnorrkel v0.0.0-20200626160457-b38283118816
+github.com/ChainSafe/go-schnorrkel
+# github.com/beorn7/perks v1.0.1
+github.com/beorn7/perks/quantile
+# github.com/btcsuite/btcd v0.0.0-20190824003749-130ea5bddde3
+github.com/btcsuite/btcd/btcec
+# github.com/btcsuite/btcutil v0.0.0-20190425235716-9e5f4b9a998d
+github.com/btcsuite/btcutil/base58
+# github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
+github.com/cosmos/go-bip39
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
+# github.com/felixge/httpsnoop v1.0.1
+github.com/felixge/httpsnoop
+# github.com/fsnotify/fsnotify v1.4.7
+github.com/fsnotify/fsnotify
+# github.com/go-kit/kit v0.9.0
+github.com/go-kit/kit/log
+github.com/go-kit/kit/log/level
+github.com/go-kit/kit/log/term
+github.com/go-kit/kit/metrics
+github.com/go-kit/kit/metrics/discard
+github.com/go-kit/kit/metrics/internal/lv
+github.com/go-kit/kit/metrics/prometheus
+# github.com/go-logfmt/logfmt v0.5.0
+github.com/go-logfmt/logfmt
+# github.com/go-stack/stack v1.8.0
+github.com/go-stack/stack
+# github.com/gogo/protobuf v1.3.1
+github.com/gogo/protobuf/gogoproto
+github.com/gogo/protobuf/jsonpb
+github.com/gogo/protobuf/proto
+github.com/gogo/protobuf/protoc-gen-gogo/descriptor
+github.com/gogo/protobuf/sortkeys
+github.com/gogo/protobuf/types
+# github.com/golang/protobuf v1.5.0
+github.com/golang/protobuf/jsonpb
+github.com/golang/protobuf/proto
+github.com/golang/protobuf/protoc-gen-go/descriptor
+github.com/golang/protobuf/protoc-gen-go/generator
+github.com/golang/protobuf/protoc-gen-go/generator/internal/remap
+github.com/golang/protobuf/protoc-gen-go/plugin
+github.com/golang/protobuf/ptypes
+github.com/golang/protobuf/ptypes/any
+github.com/golang/protobuf/ptypes/duration
+github.com/golang/protobuf/ptypes/timestamp
+github.com/golang/protobuf/ptypes/wrappers
+# github.com/gorilla/handlers v1.5.1
+github.com/gorilla/handlers
+# github.com/gorilla/mux v1.8.0
+github.com/gorilla/mux
+# github.com/gorilla/rpc v1.2.0
+github.com/gorilla/rpc/v2
+github.com/gorilla/rpc/v2/json2
+# github.com/grpc-ecosystem/grpc-gateway v1.9.2
+github.com/grpc-ecosystem/grpc-gateway/internal
+github.com/grpc-ecosystem/grpc-gateway/runtime
+github.com/grpc-ecosystem/grpc-gateway/utilities
+# github.com/gtank/merlin v0.1.1-0.20191105220539-8318aed1a79f
+github.com/gtank/merlin
+# github.com/gtank/ristretto255 v0.1.2
+github.com/gtank/ristretto255
+github.com/gtank/ristretto255/internal/edwards25519
+github.com/gtank/ristretto255/internal/radix51
+github.com/gtank/ristretto255/internal/scalar
+# github.com/hashicorp/hcl v1.0.0
+github.com/hashicorp/hcl
+github.com/hashicorp/hcl/hcl/ast
+github.com/hashicorp/hcl/hcl/parser
+github.com/hashicorp/hcl/hcl/printer
+github.com/hashicorp/hcl/hcl/scanner
+github.com/hashicorp/hcl/hcl/strconv
+github.com/hashicorp/hcl/hcl/token
+github.com/hashicorp/hcl/json/parser
+github.com/hashicorp/hcl/json/scanner
+github.com/hashicorp/hcl/json/token
+# github.com/hyperledger/burrow v0.30.5 => github.com/xuperchain/burrow v0.30.6-0.20210304060557-02933899eeb0
+github.com/hyperledger/burrow/acm
+github.com/hyperledger/burrow/acm/acmstate
+github.com/hyperledger/burrow/acm/balance
+github.com/hyperledger/burrow/acm/validator
+github.com/hyperledger/burrow/binary
+github.com/hyperledger/burrow/crypto
+github.com/hyperledger/burrow/deploy/compile
+github.com/hyperledger/burrow/encoding
+github.com/hyperledger/burrow/encoding/rlp
+github.com/hyperledger/burrow/event
+github.com/hyperledger/burrow/event/pubsub
+github.com/hyperledger/burrow/event/query
+github.com/hyperledger/burrow/execution/engine
+github.com/hyperledger/burrow/execution/errors
+github.com/hyperledger/burrow/execution/evm
+github.com/hyperledger/burrow/execution/evm/abi
+github.com/hyperledger/burrow/execution/evm/asm
+github.com/hyperledger/burrow/execution/evm/asm/bc
+github.com/hyperledger/burrow/execution/exec
+github.com/hyperledger/burrow/execution/names
+github.com/hyperledger/burrow/execution/native
+github.com/hyperledger/burrow/execution/registry
+github.com/hyperledger/burrow/genesis
+github.com/hyperledger/burrow/genesis/spec
+github.com/hyperledger/burrow/keys
+github.com/hyperledger/burrow/logging
+github.com/hyperledger/burrow/logging/errors
+github.com/hyperledger/burrow/logging/structure
+github.com/hyperledger/burrow/permission
+github.com/hyperledger/burrow/txs
+github.com/hyperledger/burrow/txs/payload
+github.com/hyperledger/burrow/util/slice
+# github.com/inconshreveable/mousetrap v1.0.0
+github.com/inconshreveable/mousetrap
+# github.com/libp2p/go-buffer-pool v0.0.2
+github.com/libp2p/go-buffer-pool
+# github.com/magiconair/properties v1.8.1
+github.com/magiconair/properties
+# github.com/matttproud/golang_protobuf_extensions v1.0.1
+github.com/matttproud/golang_protobuf_extensions/pbutil
+# github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643
+github.com/mimoo/StrobeGo/strobe
+# github.com/mitchellh/mapstructure v1.1.2
+github.com/mitchellh/mapstructure
+# github.com/pelletier/go-toml v1.2.0
+github.com/pelletier/go-toml
+# github.com/pkg/errors v0.9.1
+github.com/pkg/errors
+# github.com/prometheus/client_golang v1.1.0
+github.com/prometheus/client_golang/prometheus
+github.com/prometheus/client_golang/prometheus/internal
+# github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
+github.com/prometheus/client_model/go
+# github.com/prometheus/common v0.6.0
+github.com/prometheus/common/expfmt
+github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
+github.com/prometheus/common/model
+# github.com/prometheus/procfs v0.0.5
+github.com/prometheus/procfs
+github.com/prometheus/procfs/internal/fs
+github.com/prometheus/procfs/internal/util
+# github.com/spf13/afero v1.1.2
+github.com/spf13/afero
+github.com/spf13/afero/mem
+# github.com/spf13/cast v1.3.0
+github.com/spf13/cast
+# github.com/spf13/cobra v1.1.3
+github.com/spf13/cobra
+# github.com/spf13/jwalterweatherman v1.0.0
+github.com/spf13/jwalterweatherman
+# github.com/spf13/pflag v1.0.5
+github.com/spf13/pflag
+# github.com/spf13/viper v1.7.1
+github.com/spf13/viper
+# github.com/subosito/gotenv v1.2.0
+github.com/subosito/gotenv
+# github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
+github.com/syndtr/goleveldb/leveldb/comparer
+github.com/syndtr/goleveldb/leveldb/errors
+github.com/syndtr/goleveldb/leveldb/iterator
+github.com/syndtr/goleveldb/leveldb/memdb
+github.com/syndtr/goleveldb/leveldb/storage
+github.com/syndtr/goleveldb/leveldb/util
+# github.com/tendermint/go-amino v0.14.1
+github.com/tendermint/go-amino
+# github.com/tendermint/tendermint v0.33.1
+github.com/tendermint/tendermint/abci/types
+github.com/tendermint/tendermint/config
+github.com/tendermint/tendermint/crypto
+github.com/tendermint/tendermint/crypto/ed25519
+github.com/tendermint/tendermint/crypto/encoding/amino
+github.com/tendermint/tendermint/crypto/merkle
+github.com/tendermint/tendermint/crypto/multisig
+github.com/tendermint/tendermint/crypto/multisig/bitarray
+github.com/tendermint/tendermint/crypto/secp256k1
+github.com/tendermint/tendermint/crypto/secp256k1/internal/secp256k1
+github.com/tendermint/tendermint/crypto/sr25519
+github.com/tendermint/tendermint/crypto/tmhash
+github.com/tendermint/tendermint/libs/async
+github.com/tendermint/tendermint/libs/bits
+github.com/tendermint/tendermint/libs/bytes
+github.com/tendermint/tendermint/libs/cmap
+github.com/tendermint/tendermint/libs/flowrate
+github.com/tendermint/tendermint/libs/kv
+github.com/tendermint/tendermint/libs/log
+github.com/tendermint/tendermint/libs/math
+github.com/tendermint/tendermint/libs/net
+github.com/tendermint/tendermint/libs/os
+github.com/tendermint/tendermint/libs/pubsub
+github.com/tendermint/tendermint/libs/pubsub/query
+github.com/tendermint/tendermint/libs/rand
+github.com/tendermint/tendermint/libs/service
+github.com/tendermint/tendermint/libs/strings
+github.com/tendermint/tendermint/libs/timer
+github.com/tendermint/tendermint/p2p
+github.com/tendermint/tendermint/p2p/conn
+github.com/tendermint/tendermint/types
+github.com/tendermint/tendermint/types/time
+github.com/tendermint/tendermint/version
+# github.com/tmthrgd/atomics v0.0.0-20190904060638-dc7a5fcc7e0d
+github.com/tmthrgd/atomics
+# github.com/tmthrgd/go-bitset v0.0.0-20190904054048-394d9a556c05
+github.com/tmthrgd/go-bitset
+github.com/tmthrgd/go-bitset/internal/bitwise
+# github.com/tmthrgd/go-bitwise v0.0.0-20190904053232-1430ee983fca
+github.com/tmthrgd/go-bitwise
+# github.com/tmthrgd/go-byte-test v0.0.0-20190904060354-2794345b9929
+github.com/tmthrgd/go-byte-test
+# github.com/tmthrgd/go-hex v0.0.0-20190303111820-0bdcb15db631
+github.com/tmthrgd/go-hex
+# github.com/tmthrgd/go-memset v0.0.0-20190904060434-6fb7a21f88f1
+github.com/tmthrgd/go-memset
+# github.com/tmthrgd/go-popcount v0.0.0-20190904054823-afb1ace8b04f
+github.com/tmthrgd/go-popcount
+# github.com/xuperchain/log15 v0.0.0-20190620081506-bc88a9198230
+github.com/xuperchain/log15
+# github.com/xuperchain/xuperchain v0.0.0-20210208123615-2d08ff11de3e => /Users/shikenian/go/src/github.com/xuperchain/xuperchain
+github.com/xuperchain/xuperchain/core/common
+github.com/xuperchain/xuperchain/core/common/config
+github.com/xuperchain/xuperchain/core/common/log
+github.com/xuperchain/xuperchain/core/contract
+github.com/xuperchain/xuperchain/core/contract/bridge
+github.com/xuperchain/xuperchain/core/contract/evm
+github.com/xuperchain/xuperchain/core/contract/evm/abi
+github.com/xuperchain/xuperchain/core/contractsdk/go/pb
+github.com/xuperchain/xuperchain/core/crypto/account
+github.com/xuperchain/xuperchain/core/crypto/aes/ecb
+github.com/xuperchain/xuperchain/core/crypto/aes/padding
+github.com/xuperchain/xuperchain/core/crypto/client
+github.com/xuperchain/xuperchain/core/crypto/client/base
+github.com/xuperchain/xuperchain/core/crypto/common
+github.com/xuperchain/xuperchain/core/crypto/config
+github.com/xuperchain/xuperchain/core/crypto/hash
+github.com/xuperchain/xuperchain/core/crypto/multisign
+github.com/xuperchain/xuperchain/core/crypto/utils
+github.com/xuperchain/xuperchain/core/global
+github.com/xuperchain/xuperchain/core/hdwallet/rand
+github.com/xuperchain/xuperchain/core/hdwallet/wordlist
+github.com/xuperchain/xuperchain/core/kv/kvdb
+github.com/xuperchain/xuperchain/core/ledger
+github.com/xuperchain/xuperchain/core/pb
+github.com/xuperchain/xuperchain/core/permission/acl
+github.com/xuperchain/xuperchain/core/permission/acl/utils
+github.com/xuperchain/xuperchain/core/pluginmgr
+github.com/xuperchain/xuperchain/core/xmodel
+github.com/xuperchain/xuperchain/core/xmodel/pb
+# go.uber.org/atomic v1.6.0
+go.uber.org/atomic
+# go.uber.org/multierr v1.5.0
+go.uber.org/multierr
+# go.uber.org/zap v1.16.0
+go.uber.org/zap
+go.uber.org/zap/buffer
+go.uber.org/zap/internal/bufferpool
+go.uber.org/zap/internal/color
+go.uber.org/zap/internal/exit
+go.uber.org/zap/zapcore
+# golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+golang.org/x/crypto/blake2b
+golang.org/x/crypto/chacha20
+golang.org/x/crypto/chacha20poly1305
+golang.org/x/crypto/curve25519
+golang.org/x/crypto/ed25519
+golang.org/x/crypto/ed25519/internal/edwards25519
+golang.org/x/crypto/hkdf
+golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/nacl/box
+golang.org/x/crypto/nacl/secretbox
+golang.org/x/crypto/pbkdf2
+golang.org/x/crypto/poly1305
+golang.org/x/crypto/ripemd160
+golang.org/x/crypto/salsa20/salsa
+golang.org/x/crypto/scrypt
+golang.org/x/crypto/sha3
+# golang.org/x/net v0.0.0-20201021035429-f5854403a974
+golang.org/x/net/context
+golang.org/x/net/http/httpguts
+golang.org/x/net/http2
+golang.org/x/net/http2/hpack
+golang.org/x/net/idna
+golang.org/x/net/internal/timeseries
+golang.org/x/net/trace
+# golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f
+golang.org/x/sys/cpu
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# golang.org/x/text v0.3.3
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+# google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
+google.golang.org/genproto/googleapis/api/annotations
+google.golang.org/genproto/googleapis/api/httpbody
+google.golang.org/genproto/googleapis/rpc/status
+google.golang.org/genproto/protobuf/field_mask
+# google.golang.org/grpc v1.36.0
+google.golang.org/grpc
+google.golang.org/grpc/attributes
+google.golang.org/grpc/backoff
+google.golang.org/grpc/balancer
+google.golang.org/grpc/balancer/base
+google.golang.org/grpc/balancer/grpclb/state
+google.golang.org/grpc/balancer/roundrobin
+google.golang.org/grpc/binarylog/grpc_binarylog_v1
+google.golang.org/grpc/codes
+google.golang.org/grpc/connectivity
+google.golang.org/grpc/credentials
+google.golang.org/grpc/encoding
+google.golang.org/grpc/encoding/proto
+google.golang.org/grpc/grpclog
+google.golang.org/grpc/internal
+google.golang.org/grpc/internal/backoff
+google.golang.org/grpc/internal/balancerload
+google.golang.org/grpc/internal/binarylog
+google.golang.org/grpc/internal/buffer
+google.golang.org/grpc/internal/channelz
+google.golang.org/grpc/internal/credentials
+google.golang.org/grpc/internal/envconfig
+google.golang.org/grpc/internal/grpclog
+google.golang.org/grpc/internal/grpcrand
+google.golang.org/grpc/internal/grpcsync
+google.golang.org/grpc/internal/grpcutil
+google.golang.org/grpc/internal/metadata
+google.golang.org/grpc/internal/resolver
+google.golang.org/grpc/internal/resolver/dns
+google.golang.org/grpc/internal/resolver/passthrough
+google.golang.org/grpc/internal/resolver/unix
+google.golang.org/grpc/internal/serviceconfig
+google.golang.org/grpc/internal/status
+google.golang.org/grpc/internal/syscall
+google.golang.org/grpc/internal/transport
+google.golang.org/grpc/internal/transport/networktype
+google.golang.org/grpc/keepalive
+google.golang.org/grpc/metadata
+google.golang.org/grpc/peer
+google.golang.org/grpc/resolver
+google.golang.org/grpc/serviceconfig
+google.golang.org/grpc/stats
+google.golang.org/grpc/status
+google.golang.org/grpc/tap
+# google.golang.org/protobuf v1.26.0-rc.1
+google.golang.org/protobuf/encoding/protojson
+google.golang.org/protobuf/encoding/prototext
+google.golang.org/protobuf/encoding/protowire
+google.golang.org/protobuf/internal/descfmt
+google.golang.org/protobuf/internal/descopts
+google.golang.org/protobuf/internal/detrand
+google.golang.org/protobuf/internal/encoding/defval
+google.golang.org/protobuf/internal/encoding/json
+google.golang.org/protobuf/internal/encoding/messageset
+google.golang.org/protobuf/internal/encoding/tag
+google.golang.org/protobuf/internal/encoding/text
+google.golang.org/protobuf/internal/errors
+google.golang.org/protobuf/internal/filedesc
+google.golang.org/protobuf/internal/filetype
+google.golang.org/protobuf/internal/flags
+google.golang.org/protobuf/internal/genid
+google.golang.org/protobuf/internal/impl
+google.golang.org/protobuf/internal/order
+google.golang.org/protobuf/internal/pragma
+google.golang.org/protobuf/internal/set
+google.golang.org/protobuf/internal/strs
+google.golang.org/protobuf/internal/version
+google.golang.org/protobuf/proto
+google.golang.org/protobuf/reflect/protodesc
+google.golang.org/protobuf/reflect/protoreflect
+google.golang.org/protobuf/reflect/protoregistry
+google.golang.org/protobuf/runtime/protoiface
+google.golang.org/protobuf/runtime/protoimpl
+google.golang.org/protobuf/types/descriptorpb
+google.golang.org/protobuf/types/known/anypb
+google.golang.org/protobuf/types/known/durationpb
+google.golang.org/protobuf/types/known/fieldmaskpb
+google.golang.org/protobuf/types/known/timestamppb
+google.golang.org/protobuf/types/known/wrapperspb
+google.golang.org/protobuf/types/pluginpb
+# gopkg.in/ini.v1 v1.51.0
+gopkg.in/ini.v1
+# gopkg.in/yaml.v2 v2.4.0
+gopkg.in/yaml.v2
